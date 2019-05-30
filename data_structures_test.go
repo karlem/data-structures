@@ -3,6 +3,8 @@ package main
 import (
 	"reflect"
 	"testing"
+
+	"github.com/pkg/errors"
 )
 
 func TestLinkedList(t *testing.T) {
@@ -55,5 +57,60 @@ func TestLinkedList(t *testing.T) {
 	arrExpected = []interface{}{3, 4, 5}
 	if reflect.DeepEqual(arr, arrExpected) == false {
 		t.Errorf("Position in array were incorrect, got: %v, want: %v", arr, arrExpected)
+	}
+}
+
+func assertStackPop(st *Stack, expected interface{}) error {
+	item, err := st.Pop()
+	if err != nil {
+		return errors.Errorf("Popped item error occur, err: %s", err)
+	}
+
+	if item != expected {
+		return errors.Errorf("Popped item was incorrect, got: %v, want: %v", item, expected)
+	}
+
+	return nil
+}
+
+func assertStackEmpty(st *Stack, expected bool) error {
+	if isEmpty := st.IsEpmty(); isEmpty != expected {
+		return errors.Errorf("IsEpmty was incorrect, got: %v, want: %v", isEmpty, expected)
+	}
+
+	return nil
+}
+
+func TestStack(t *testing.T) {
+	st := NewStack()
+
+	if err := assertStackEmpty(st, true); err != nil {
+		t.Error(err)
+	}
+
+	st.Push(1)
+	st.Push(2)
+	st.Push(3)
+	st.Push(4)
+
+	if err := assertStackEmpty(st, false); err != nil {
+		t.Error(err)
+	}
+
+	if err := assertStackPop(st, 4); err != nil {
+		t.Error(err)
+	}
+	if err := assertStackPop(st, 3); err != nil {
+		t.Error(err)
+	}
+	if err := assertStackPop(st, 2); err != nil {
+		t.Error(err)
+	}
+	if err := assertStackPop(st, 1); err != nil {
+		t.Error(err)
+	}
+
+	if err := assertStackEmpty(st, true); err != nil {
+		t.Error(err)
 	}
 }
