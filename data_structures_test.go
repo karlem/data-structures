@@ -114,3 +114,56 @@ func TestStack(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func assertQueueDequeue(q *Queue, expected interface{}) error {
+	item, err := q.Dequeue()
+	if err != nil {
+		return errors.Errorf("Dequeued item error occur, err: %s", err)
+	}
+
+	if item != expected {
+		return errors.Errorf("Dequeued item was incorrect, got: %v, want: %v", item, expected)
+	}
+
+	return nil
+}
+
+func TestQueue(t *testing.T) {
+	q := NewQueue()
+
+	q.Enqueue(1)
+	q.Enqueue(2)
+	q.Enqueue(3)
+	q.Enqueue(4)
+
+	if err := assertQueueDequeue(q, 1); err != nil {
+		t.Error(err)
+	}
+
+	if err := assertQueueDequeue(q, 2); err != nil {
+		t.Error(err)
+	}
+
+	q.Enqueue(6)
+	q.Enqueue(7)
+
+	if err := assertQueueDequeue(q, 3); err != nil {
+		t.Error(err)
+	}
+	if err := assertQueueDequeue(q, 4); err != nil {
+		t.Error(err)
+	}
+
+	q.Dequeue()
+	q.Dequeue()
+
+	if item, err := q.Dequeue(); err == nil {
+		t.Errorf("Expected empty queue error, got: %v", item)
+	}
+
+	q.Enqueue(1)
+
+	if err := assertQueueDequeue(q, 1); err != nil {
+		t.Error(err)
+	}
+}
